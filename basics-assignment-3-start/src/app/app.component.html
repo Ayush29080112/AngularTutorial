@@ -11,3 +11,8 @@
     </div>
   </div>
 </div>
+<button class="btn btn-primary" (click)="onButtonClick()">Display Details</button>
+<p *ngIf =  "displayParagraph">This is a secret paragraph</p>
+
+
+<p *ngFor = "let row of clickEvent" [ngStyle] = "{backgroundColor: row >4 ? 'blue' : 'white'}" [ngClass]="{event: row>4}">{{row}}</p>
