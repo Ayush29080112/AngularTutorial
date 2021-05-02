@@ -1,0 +1,16 @@
+<div class="container">
+    <app-server-form-component (serverCreated)= "onServerCreated($event)" (bluprintCreated)="onBluePrintCreated($event)"></app-server-form-component>
+  <hr>
+  <div class="row">
+    <div class="col-xs-12">
+      <button class="btn btn-primary" (click)="onChangeFirstELement()"> Change First Element</button>
+      <button class="btn btn-danger" (click)="onDestroy()">Delete First Element</button>
+      <app-server-element-component *ngFor = "let element of serverElements" [element] = "element" [name] ="element.name">
+        <p>
+          <strong *ngIf="element.type === 'server'" style="color: red">{{ element.content }}</strong>
+          <em *ngIf="element.type === 'blueprint'">{{ element.content }}</em>
+        </p>
+      </app-server-element-component>
+    </div>
+  </div>
+</div>
