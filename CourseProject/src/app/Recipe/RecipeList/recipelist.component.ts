@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, EventEmitter, Output } from "@angular/core";
 import { Recipe } from "../recipe.model";
 
 @Component({
@@ -11,5 +11,12 @@ export class RecipeListComponent{
         new Recipe("Palak Paneer","Cottage Cheese cooked in Spinach Gravy","https://shwetainthekitchen.com/wp-content/uploads/2014/03/DSC_1095.jpg"),
         new Recipe("Kaju Paneer","Cottage Cheese cooked with Cashew gravy","https://ohdishkitchen.in/wp-content/uploads/2020/05/Kaju-Paneer-masala.jpeg")
     ];
+
+    @Output() loadRecipeDetailsEvent= new EventEmitter<Recipe>();
+
+    loadRecipe(recipe: Recipe){
+       this.loadRecipeDetailsEvent.emit(recipe)
+
+    }
 
 }

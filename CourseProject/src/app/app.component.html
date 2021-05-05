@@ -1,7 +1,7 @@
-<app-header></app-header>
+<app-header (clickEvent) = 'onHeaderCLick($event)'></app-header>
 <div class="row">
   <div class="col-xs-12">
-    <app-recipe></app-recipe>
-    <app-shopping></app-shopping>
+    <app-recipe *ngIf ='clicked==="Recipes"'></app-recipe>
+    <app-shopping *ngIf ='clicked==="Shopping"'></app-shopping>
   </div>
 </div>
