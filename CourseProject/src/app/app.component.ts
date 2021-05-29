@@ -9,9 +9,4 @@ import { RecipeService } from './Recipe/recipe.service';
 })
 export class AppComponent {
 
-  clicked ='';
-
-  onHeaderCLick(iconClicked:string){
-    this.clicked=iconClicked;
-  }
 }
