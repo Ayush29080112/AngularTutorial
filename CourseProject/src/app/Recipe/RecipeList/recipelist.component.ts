@@ -19,7 +19,7 @@ export class RecipeListComponent implements OnInit,OnDestroy{
 
         this.recipes = this.recipesService.getRecipies()
         this.subscription= this.recipesService.loadRecipeDetailsEvent.subscribe(
-           (recipesUpdated) =>this.recipes =recipesUpdated
+           (recipesUpdated) =>this.recipes = recipesUpdated
         )
         
     }
