@@ -17,18 +17,27 @@ import { ShoppingList } from './Shopping/ShoppingList/shoppinlist.component';
 import { ShoppingListEdit } from './Shopping/ShoppingListEdit/shoppinglistedit.component';
 import { RecipeClickComponentComponent } from './Recipe/recipe-click-component/recipe-click-component.component';
 import { RecipeEditComponent } from './Recipe/recipe-edit/recipe-edit.component';
+import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http'
+import { RecipeResolverService } from './Recipe/recipe-resolver.service';
+import { AuthComponent } from './auth/auth/auth.component';
+import { LoadingSpinnerComponent } from './Shared/loading-spinner/loading-spinner.component';
+import { AuthInterceptor } from './auth/auth/auth-interceptor.service';
+import { AuthGuard } from './auth/auth/auth.guard';
+import { AlertComponent } from './Shared/alert/alert.component';
+import { PlaceHolderDirective } from './Shared/placeholder/placeholder.directive';
 
 
 const approutes: Routes =[
   {path:'', redirectTo:'/recipes', pathMatch:'full'},
   {path:'shopping' , component: ShoppingComponent},
-  {path:'recipes', component: RecipeComponent, children:[
+  {path:'recipes', component: RecipeComponent,canActivate:[AuthGuard], children:[
     {path:'', component:RecipeClickComponentComponent},
     {path: 'new', component:RecipeEditComponent},
-    {path:':id', component: RecipeDetailComponent},
-    {path: ':id/edit', component:RecipeEditComponent}
-
-  ]}
+    {path:':id', component: RecipeDetailComponent, resolve:[RecipeResolverService]},
+    {path: ':id/edit', component:RecipeEditComponent, resolve:[RecipeResolverService]}
+    
+  ]},
+  {path: 'auth',component:AuthComponent}
 ]
 
 @NgModule({
@@ -44,15 +53,20 @@ const approutes: Routes =[
     RecipeDetailComponent,
     DropdownDirective,
     RecipeClickComponentComponent,
-    RecipeEditComponent
+    RecipeEditComponent,
+    AuthComponent,
+    LoadingSpinnerComponent,
+    AlertComponent,
+    PlaceHolderDirective
   ],
   imports: [
     BrowserModule,
     FormsModule,
     RouterModule.forRoot(approutes),
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    HttpClientModule
   ],
-  providers: [RecipeService,ShoppingService],
+  providers: [RecipeService,ShoppingService,{provide:HTTP_INTERCEPTORS,useClass:AuthInterceptor,multi:true}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
