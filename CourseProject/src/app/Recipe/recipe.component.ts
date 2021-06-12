@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
+import { DataStorageService } from "../Shared/datastorage.service";
 import { Recipe } from "./recipe.model";
-import { RecipeService } from "./recipe.service";
 
 @Component({
     selector:"app-recipe",
@@ -11,7 +11,7 @@ export class RecipeComponent implements OnInit{
 
     recipe:Recipe;
 
-    constructor(private recipeService:RecipeService, private routes: Router, private activeRoute:ActivatedRoute){}
+    constructor(private dataStorageService:DataStorageService, private routes: Router, private activeRoute:ActivatedRoute){}
 
     ngOnInit(){
         // console.log('I am being called')
@@ -25,6 +25,8 @@ export class RecipeComponent implements OnInit{
         // if(this.recipe == undefined){
         //     this.routes.navigate(['please','selectRecipe'], {relativeTo:this.activeRoute})
         // }
+
+        this.dataStorageService.fetchRecipies().subscribe();
     }
 
 }
