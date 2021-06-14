@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { Ingredient } from "../Shared/ingredient.model";
-import { ShoppingService } from "./shopping.service";
+
 
 @Component({
     selector: "app-shopping",
@@ -8,11 +8,10 @@ import { ShoppingService } from "./shopping.service";
 })
 export class ShoppingComponent implements OnInit{
 
-    ingredients:Ingredient[]
 
-   constructor(private shoppingService:ShoppingService){}
+   constructor(){}
     ngOnInit(): void {
-        this.ingredients =  this.shoppingService.getIngredients();
+       
     }
 
 }

@@ -4,7 +4,6 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './Header/header.component';
-import { ShoppingService } from './Shopping/shopping.service';
 import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http'
 import { AuthInterceptor } from './auth/auth/auth-interceptor.service';
 import { AuthModule } from './auth/auth.module';
@@ -31,7 +30,7 @@ const approutes: Routes =[
     StoreModule.forRoot(reducers),
     RecipeModule
   ],
-  providers: [RecipeService,ShoppingService,{provide:HTTP_INTERCEPTORS,useClass:AuthInterceptor,multi:true}],
+  providers: [RecipeService,{provide:HTTP_INTERCEPTORS,useClass:AuthInterceptor,multi:true}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
