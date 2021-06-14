@@ -10,6 +10,8 @@ import { AuthInterceptor } from './auth/auth/auth-interceptor.service';
 import { AuthModule } from './auth/auth.module';
 import { RecipeService } from './Recipe/recipe.service';
 import { RecipeModule } from './Recipe/recipe.module';
+import { StoreModule } from '@ngrx/store';
+import { reducers } from './store/app.store';
 
 
 const approutes: Routes =[
@@ -26,6 +28,7 @@ const approutes: Routes =[
     RouterModule.forRoot(approutes),
     HttpClientModule,
     AuthModule,
+    StoreModule.forRoot(reducers),
     RecipeModule
   ],
   providers: [RecipeService,ShoppingService,{provide:HTTP_INTERCEPTORS,useClass:AuthInterceptor,multi:true}],
