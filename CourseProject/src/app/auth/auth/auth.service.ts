@@ -5,6 +5,9 @@ import { BehaviorSubject, ReplaySubject, Subject, throwError } from "rxjs";
 import { catchError, tap } from "rxjs/operators";
 import { User } from "../user.model";
 import {environment} from  '../../../environments/environment' 
+import { Store } from "@ngrx/store";
+import { AppState } from "src/app/store/app.store";
+import { Login, Logout } from "../store/auth.action";
 
 
 
@@ -20,85 +23,24 @@ export interface AuthResponseData{
 @Injectable({providedIn:'root'})
 export class AuthService{
 
-        userSubject = new BehaviorSubject<User>(new  User());
+        // userSubject = new BehaviorSubject<User>(new  User());
 
         private tokenExpirationTimer:any
-        constructor(private http: HttpClient, private router:Router){}
+        constructor(private store:Store<AppState>){}
 
-        signUp(email:string, password:string){
-            return this.http.post<AuthResponseData>('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key='+environment['firebaseAPIKey'],{
-                email:email,
-                password:password,
-                returnSecureToken:true
-            }).pipe(catchError(this.handleError), tap((response)=>{
-                const expirationDate = new Date(new Date().getTime() + +response.expiresIn*1000)
-                const user = new User(response.email, response.localId,response.idToken,expirationDate)
-                this.autoLogout(+response.expiresIn*1000)
-                this.userSubject.next(user)
-            }))
+        
+
+        setLogoutTimer(expirationNumber:number){
+            this.tokenExpirationTimer = setTimeout(()=>{this.store.dispatch(new  Logout())},expirationNumber)
         }
 
-        login(email:string, password:string){
-            return this.http.post<AuthResponseData>('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key='+environment['firebaseAPIKey'],{
-                email:email,
-                password:password,
-                returnSecureToken:true
-            }).pipe(catchError( this.handleError),tap((response)=>{
-                const expirationDate = new Date(new Date().getTime() + +response.expiresIn*1000)
-                const user = new User(response.email, response.localId,response.idToken,expirationDate)
-                this.autoLogout(+response.expiresIn*1000)
-                this.userSubject.next(user)
-                localStorage.setItem('user',JSON.stringify(user))
-            }))
-        }
-
-        logout(){
-            this.userSubject.next(new User());
-            this.router.navigate(['/auth'])
-            localStorage.removeItem('user');
+        clearLogOutTimer(){
             if(this.tokenExpirationTimer){
                 clearTimeout(this.tokenExpirationTimer)
+                this.tokenExpirationTimer = null
             }
         }
 
-        autoLogout(expirationNumber:number){
-            this.tokenExpirationTimer = setTimeout(()=>{this.logout()},expirationNumber)
-        }
-
-        autoLogin(){
-
-            let storedString =localStorage.getItem('user')
-            console.log(storedString)
-            const user:  {email:string,id:string,_token:string,_tokenExpirationDate:string} = JSON.parse( storedString?storedString:'')
-            let loggedInUser = new User(user.email,user.id,user._token, new Date(user._tokenExpirationDate))
-            console.log(loggedInUser)
-            if(!loggedInUser){
-                return;
-            }
-            console.log(loggedInUser.token)
-            if(loggedInUser.token){
-                const expirationDuration = new Date(user._tokenExpirationDate).getTime() - new Date().getTime()
-                     this.autoLogout(expirationDuration)
-                   this.userSubject.next(loggedInUser)
-            }
-            
-
-
-        }
-
-        private handleError(errorResponse: HttpErrorResponse ){
-            let errorMessage = 'An Undefined Error occured'
-                if(!errorResponse.error || !errorResponse.error.error){
-                    return throwError(errorMessage)
-                }else{
-                    switch(errorResponse.error.error.message){
-                        case ('EMAIL_EXISTS'):
-                            errorMessage ='This email already exists';
-                            break;
-                        case ('EMAIL_NOT_FOUND'):
-                            errorMessage = 'Email Id Does not exist'
-                    }
-                    return throwError(errorMessage)
-                }
-        }
+       
+       
 }

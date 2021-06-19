@@ -1,11 +1,13 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { Store } from "@ngrx/store";
+import { map } from "rxjs/operators";
 
 import { AddIngredients } from "src/app/Shopping/store/shoppingList.action";
 import { AppState } from "src/app/store/app.store";
 import { Recipe } from "../recipe.model";
 import { RecipeService } from "../recipe.service";
+import { DeleteRecipe } from "../store/recipe.action";
 
 @Component({
     selector:"app-recipe-detail",
@@ -19,7 +21,18 @@ export class RecipeDetailComponent implements OnInit{
     ngOnInit(): void {
         this.activeRoute.params.subscribe((params)=>{
             this.id = +params['id']
-            this.recipe = this.recipeService.getRecipe(this.id)
+            // this.recipe = this.recipeService.getRecipe(this.id)
+            this.store.select('recipe').pipe(
+                map(
+                    (recipeState)=>{
+                        return recipeState.recipes.find((recipe,index)=>{
+                            return index  === this.id
+                    })
+                }))
+                .subscribe((recipe)=>{
+                    this.recipe = recipe
+                })
+           
         })
     }
 
@@ -35,7 +48,8 @@ export class RecipeDetailComponent implements OnInit{
     }
 
     onDeleteRecipe(){
-        this.recipeService.deleteRecipe(this.id);
+        //this.recipeService.deleteRecipe(this.id);
+        this.store.dispatch(new DeleteRecipe(this.id))
         this.router.navigate(['/'])
     }
 

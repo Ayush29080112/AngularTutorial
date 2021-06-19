@@ -11,6 +11,9 @@ import { RecipeService } from './Recipe/recipe.service';
 import { RecipeModule } from './Recipe/recipe.module';
 import { StoreModule } from '@ngrx/store';
 import { reducers } from './store/app.store';
+import { EffectsModule } from '@ngrx/effects';
+import { AuthEffects } from './auth/store/auth.effects';
+import { RecipeEffects } from './Recipe/store/recipe.effect';
 
 
 const approutes: Routes =[
@@ -28,6 +31,7 @@ const approutes: Routes =[
     HttpClientModule,
     AuthModule,
     StoreModule.forRoot(reducers),
+    EffectsModule.forRoot([AuthEffects, RecipeEffects]),
     RecipeModule
   ],
   providers: [RecipeService,{provide:HTTP_INTERCEPTORS,useClass:AuthInterceptor,multi:true}],

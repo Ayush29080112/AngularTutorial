@@ -1,9 +1,12 @@
 import { Component, ComponentFactoryResolver, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
 import { AlertComponent } from 'src/app/Shared/alert/alert.component';
 import { PlaceHolderDirective } from 'src/app/Shared/placeholder/placeholder.directive';
+import { AppState } from 'src/app/store/app.store';
+import { LoginStart, SignupStart } from '../store/auth.action';
 import { AuthService } from './auth.service';
 
 @Component({
@@ -19,7 +22,7 @@ export class AuthComponent implements OnInit, OnDestroy {
   error:string = ''
   @ViewChild('authForm') form:NgForm;
   @ViewChild(PlaceHolderDirective)  alertHost:PlaceHolderDirective;
-  constructor(private authService:AuthService, private router: Router, private componentFactoryResolver: ComponentFactoryResolver) { }
+  constructor(private authService: AuthService, private router: Router, private componentFactoryResolver: ComponentFactoryResolver, private store:Store<AppState>) { }
   ngOnDestroy(): void {
     if(this.closeSub){
       this.closeSub.unsubscribe()
@@ -27,6 +30,15 @@ export class AuthComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+
+    this.store.select('auth').subscribe((authState)=>{
+      this.isLoading = authState.loading;
+      this.error = authState.authError;
+      if(this.error){
+        this.showErrorAlert(this.error);
+      }
+      
+    })
   }
 
   onSwitchMode(){
@@ -37,13 +49,14 @@ export class AuthComponent implements OnInit, OnDestroy {
     console.log(this.form);
     this.isLoading = true;
     if(!this.isLoginMode){
-      this.authService.signUp(this.form.value.email,this.form.value.password).
-      subscribe((response)=>{console.log(response), this.isLoading = false; this.router.navigate(['/auth'])},
-      error=>{this.error = error;console.log(this.error);  this.showErrorAlert(error) ;this.isLoading=false})
+      // this.authService.signUp(this.form.value.email,this.form.value.password).
+      // subscribe((response)=>{console.log(response), this.isLoading = false; this.router.navigate(['/auth'])},
+      // error=>{this.error = error;console.log(this.error);  this.showErrorAlert(error) ;this.isLoading=false})
+      this.store.dispatch(new SignupStart({email:this.form.value.email,password:this.form.value.password}))
     }else{
-      this.authService.login(this.form.value.email,this.form.value.password).
-      subscribe((response)=>{console.log(response), this.isLoading = false; this.router.navigate(['/recipes'])},
-      error=>{this.error = error;console.log(this.error); this.showErrorAlert(error);this.isLoading=false})
+      this.store.dispatch(new LoginStart({email:this.form.value.email,password:this.form.value.password}))
+      // subscribe((response)=>{console.log(response), this.isLoading = false; this.router.navigate(['/recipes'])},
+      // error=>{this.error = error;console.log(this.error); this.showErrorAlert(error);this.isLoading=false})
     }
     this.form.reset()
   }
